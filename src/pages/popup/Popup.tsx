@@ -24,7 +24,6 @@ export default function Popup(): JSX.Element {
       if (res && res.url) {
         const url = new URL(res.url)
         setCurrentUrl(url.host)
-        console.log("HERER", url.host)
       }
     })();
   }, [])
@@ -41,17 +40,7 @@ export default function Popup(): JSX.Element {
     setTimeout(() => { setCleaning(false) }, 300)
   }
 
-  const urlList = useMemo(() => {
-    return <div></div>
-    // return list.map((url, idx) => {
-    //   // const count = await getHistory({ url }).length;
-    //   return <div key={idx} className='flex flex-row'>
-    //     <div className='flex-1 text-ellipsis'>{url}</div>
-    //     <div className='w-5'>1</div>
-    //   </div>
 
-    // })
-  }, [])
 
 
   const getCurrentTab = async () => {
@@ -96,21 +85,18 @@ export default function Popup(): JSX.Element {
           </Button>
         </div>
       </div>
-      <div className='flex flex-row'>
+      {/* <div className='flex flex-row'>
         <Checkbox />
-      </div>
-      <div className='flex flex-col'>
+      </div> */}
+      {/* <div className='flex flex-col'>
         <div className='flex flex-row text-start'>
           <Title>List</Title>
         </div>
-      </div>
-      <div className='flex flex-col'>
-        {urlList}
-      </div>
+      </div> */}
       <div>
-        {currentUrlExisted ? <div>Hostname already existed</div> :
-          <Button onClick={() => { addCurrentTab() }}>Add Current Tab</Button>}
-        {addCurrentTabMsg && addCurrentTabMsg.length > 0 && "Sucecss"}</div>
+        {currentUrlExisted || (!addCurrentTabMsg && addCurrentTabMsg.length === 0) ? <div>Hostname already existed</div> :
+          <Button variant={'ghost'} onClick={() => { addCurrentTab() }}>Add Current Tab</Button>}
+        {addCurrentTabMsg && addCurrentTabMsg.length > 0 && "Success"}</div>
     </div>
   );
 }

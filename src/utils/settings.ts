@@ -1,7 +1,17 @@
-export type SettingObject = { autoClean: boolean, cleanTargetUrl: string[] | null }
+
+export const CLEAN_MODES = {
+	'AUTO': 'auto',
+	// 'AFTER_CLOSE': 'after close',
+	"MANUAL": "manual"
+}
+
+export type AutoClean = keyof typeof CLEAN_MODES;
+
+export type SettingObject = { autoClean: AutoClean, cleanTargetUrl: string[] | null }
+
 
 export const defaultSettings: SettingObject = {
-	autoClean: false,
+	autoClean: "MANUAL",
 	cleanTargetUrl: []
 }
 
