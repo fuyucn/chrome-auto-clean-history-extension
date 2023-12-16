@@ -1,0 +1,58 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "react-hooks",
+    "@typescript-eslint"
+    // "prettier"
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "camelcase": "error",
+    "eqeqeq": [
+      "error",
+      "always"
+    ],
+    "no-duplicate-imports": "error",
+    // "baseui/deprecated-theme-api": "warn",
+    // "baseui/deprecated-component-api": "warn",
+    // "baseui/no-deep-imports": "warn",
+    // "prettier/prettier": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "spaced-comment": [
+      "error",
+      "always",
+      {
+        "markers": [
+          "/"
+        ]
+      }
+    ],
+  },
+  "globals": {
+    "chrome": "readonly"
+  },
+  "ignorePatterns": [
+    "watch.js",
+    "dist/**",
+    "public"
+  ]
+}
