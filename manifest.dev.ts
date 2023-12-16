@@ -10,7 +10,6 @@ const getManifest = () => ({
   "web_accessible_resources": [
     {
       "resources": [
-        "contentStyle.css",
         "dev-icon-128.png",
         "dev-icon-32.png"
       ],
