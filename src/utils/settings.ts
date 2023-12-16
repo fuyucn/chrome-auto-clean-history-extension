@@ -18,7 +18,7 @@ export const defaultSettings: SettingObject = {
 export const getOptions = async () => {
 	const results = await chrome.storage.sync.get(Object.keys(defaultSettings))
 
-	console.log(results)
+	console.debug(results)
 	return { ...defaultSettings, ...results }
 }
 

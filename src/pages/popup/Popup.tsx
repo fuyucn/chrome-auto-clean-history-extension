@@ -13,7 +13,7 @@ export default function Popup(): JSX.Element {
   const [addCurrentTabMsg, setAddCurrentTagMsg] = useState("")
   const [currentUrl, setCurrentUrl] = useState<string>()
   const [settings, setSettings] = useState<SettingObject>()
-
+  const [successMsg, setSuccessMsg] = useState('')
   useEffect(() => {
     (async () => {
       const res = await getOptions();
@@ -30,17 +30,25 @@ export default function Popup(): JSX.Element {
 
   const onClean = async () => {
     setCleaning(true)
+    setSuccessMsg('')
     const { cleanTargetUrl } = await chrome.storage.sync.get('cleanTargetUrl')
 
-    console.log("Start Clean", cleanTargetUrl)
+    console.debug("Start Clean", cleanTargetUrl)
 
-    await Promise.all(cleanTargetUrl.map((url: string) => {
+    const results = await Promise.all(cleanTargetUrl.map((url: string) => {
       return deleteHistory({ url: url })
     }))
-    setTimeout(() => { setCleaning(false) }, 300)
+
+    const deletedCount = results.map(r => r.count).reduce((p, cur) => {
+      return p + cur
+    }, 0)
+
+    setTimeout(() => {
+      setCleaning(false);
+      setSuccessMsg("Success deleted " + deletedCount)
+    }, 300)
+
   }
-
-
 
 
   const getCurrentTab = async () => {
@@ -69,7 +77,7 @@ export default function Popup(): JSX.Element {
 
 
   const currentUrlExisted = useMemo(() => {
-    console.log(currentUrl, settings?.cleanTargetUrl)
+    console.debug(currentUrl, settings?.cleanTargetUrl)
     if (!currentUrl) return false;
     return settings?.cleanTargetUrl?.includes(currentUrl)
   }, [currentUrl, settings?.cleanTargetUrl])
@@ -85,14 +93,9 @@ export default function Popup(): JSX.Element {
           </Button>
         </div>
       </div>
-      {/* <div className='flex flex-row'>
-        <Checkbox />
-      </div> */}
-      {/* <div className='flex flex-col'>
-        <div className='flex flex-row text-start'>
-          <Title>List</Title>
-        </div>
-      </div> */}
+      <div>
+        {successMsg && successMsg.length > 0 && <div>{successMsg}</div>}
+      </div>
       <div>
         {currentUrlExisted || (!addCurrentTabMsg && addCurrentTabMsg.length === 0) ? <div>Hostname already existed</div> :
           <Button variant={'ghost'} onClick={() => { addCurrentTab() }}>Add Current Tab</Button>}
