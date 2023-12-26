@@ -1,11 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
 import { ReloadIcon } from "@radix-ui/react-icons"
 import Title from '../../components/Title';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { getHistory, deleteHistory } from '@/utils/chrome';
+import { getHistory, deleteHistory, deleteBrowsingData } from '@/utils/chrome';
 import { SettingObject, getOptions, setOption } from '@/utils/settings';
-
+import { useState, useEffect, useMemo } from 'react'
 
 
 export default function Popup(): JSX.Element {
@@ -14,16 +13,18 @@ export default function Popup(): JSX.Element {
   const [currentUrl, setCurrentUrl] = useState<string>()
   const [settings, setSettings] = useState<SettingObject>()
   const [successMsg, setSuccessMsg] = useState('')
+
   useEffect(() => {
     (async () => {
       const res = await getOptions();
       setSettings(res)
     })();
+
     (async () => {
       const res = await getCurrentTab();
       if (res && res.url) {
         const url = new URL(res.url)
-        setCurrentUrl(url.host)
+        setCurrentUrl(url.origin)
       }
     })();
   }, [])
@@ -39,9 +40,15 @@ export default function Popup(): JSX.Element {
       return deleteHistory({ url: url })
     }))
 
-    const deletedCount = results.map(r => r.count).reduce((p, cur) => {
-      return p + cur
-    }, 0)
+    await Promise.all(cleanTargetUrl.map((url: string) => {
+      return deleteBrowsingData({ url })
+    }))
+
+    const deletedCount = results
+      .map(r => r.count)
+      .reduce((p, cur) => {
+        return p + cur
+      }, 0)
 
     setTimeout(() => {
       setCleaning(false);
@@ -66,8 +73,10 @@ export default function Popup(): JSX.Element {
     const settings = await getOptions();
     const settingUrls = settings.cleanTargetUrl ?? []
 
-    if (settingUrls?.indexOf(url.host) === -1) {
-      settingUrls.push(url.host)
+    const { origin } = url
+
+    if (settingUrls?.indexOf(origin) === -1) {
+      settingUrls.push(origin)
       settings.cleanTargetUrl = settingUrls
       await setOption(settings)
     }
@@ -77,14 +86,15 @@ export default function Popup(): JSX.Element {
 
 
   const currentUrlExisted = useMemo(() => {
-    console.debug(currentUrl, settings?.cleanTargetUrl)
     if (!currentUrl) return false;
+    console.debug(currentUrl, settings?.cleanTargetUrl, settings?.cleanTargetUrl,
+      settings?.cleanTargetUrl?.includes(currentUrl))
     return settings?.cleanTargetUrl?.includes(currentUrl)
   }, [currentUrl, settings?.cleanTargetUrl])
 
 
   return (
-    <div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-50">
+    <div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-50 flex flex-col">
       <div className="flex flex-row ">
         <Title>Clean</Title>
         <div className='flex-1 flex justify-end'>
@@ -94,12 +104,17 @@ export default function Popup(): JSX.Element {
         </div>
       </div>
       <div>
-        {successMsg && successMsg.length > 0 && <div>{successMsg}</div>}
+        {successMsg && successMsg.length > 0 && <div className="text-xs text-gray-400 text-right leading-6">{successMsg}</div>}
       </div>
-      <div>
-        {currentUrlExisted || (!addCurrentTabMsg && addCurrentTabMsg.length === 0) ? <div>Hostname already existed</div> :
-          <Button variant={'ghost'} onClick={() => { addCurrentTab() }}>Add Current Tab</Button>}
-        {addCurrentTabMsg && addCurrentTabMsg.length > 0 && "Success"}</div>
+      <div className="mt-6 flex-1 flex items-end justify-center">
+        {(!addCurrentTabMsg || addCurrentTabMsg.length === 0)
+          && (
+            currentUrlExisted ?
+              <div className="font-semibold font-mono text-sm text-emerald-600" >Hostname already existed</div> :
+              <Button variant={'ghost'} onClick={() => { addCurrentTab() }}>Add Current Tab</Button>
+          )
+        }
+        {addCurrentTabMsg && addCurrentTabMsg.length > 0 && <span className="font-semibold font-mono text-sm text-emerald-600">Success</span>}</div>
     </div>
   );
 }

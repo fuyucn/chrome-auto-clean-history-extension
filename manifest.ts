@@ -28,7 +28,8 @@ const getManifest = () => ({
     // "debugger",
     "scripting",
     "history",
-    "storage"
+    "storage",
+    "browsingData",
   ],
   "devtools_page": "src/pages/devtools/index.html",
   "web_accessible_resources": [

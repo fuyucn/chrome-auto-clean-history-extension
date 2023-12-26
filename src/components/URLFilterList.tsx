@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +13,7 @@ const UrlList = ({ data, onDelete }: UrlListProps): JSX.Element => {
 	if (!data || data.length === 0) {
 		return <div>None</div>
 	}
+
 	return (
 		<div>
 			{data.map((d, idx) => {
